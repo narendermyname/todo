@@ -1,0 +1,56 @@
+<div class="container" data-ng-controller="ToDoController">
+	<label>Select Theme</label> <select ng-model="theme">
+		<option data-ng-repeat="x in themes" value="{{x}}">{{x.split('-')[1]}}</option>
+	</select>
+	<div class="panel-group">
+		<div class="panel {{theme}}">
+			<div class="panel-heading"></div>
+			<div class="panel-body">
+				<div class="form-group">
+					<input data-ng-model="msg" type="text" class="form-control"
+						id="usr" data-ng-keypress="add($event)"
+						placeholder="Enter TODO Text" />
+				</div>
+				<div class="form-group">
+					<input class="form-control" type="search" data-ng-model="search"
+						placeholder="Search TODO" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-ng-click= "hideError()" data-ng-if="error!=''"> <div class="well panel-danger">{{error}}</div></div>
+	<div class="panel-group">
+		<div class="panel {{theme}}">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" href="#collapse1">TODO </a>
+				</h4>
+			</div>
+			<div id="collapse1" class="panel-collapse collapse in">
+				<div class="panel-body"
+					style="max-height: 400px; overflow-y: scroll !important;">
+					<div class="well" data-ng-show="todos.length > 0"
+						data-ng-repeat="t in todos | filter : search">
+						<button type="button" class="btn btn-success"
+							data-toggle="tooltip" data-placement="top" title="Complete TODO"
+							data-ng-click="t.status= 'Completed';update(t)"
+							data-ng-disabled="t.status =='Completed'">&#9989</button>
+						<span data-ng-hide="t.editing" data-ng-dblclick="edit(t)"
+							class="{{t.status == 'Completed' ? 'btn btn-success' : 'btn-warning'}}">
+							{{t.msg}}</span> <input data-ng-show="t.editing" data-ng-model="t.msg"
+							data-ng-blur="t.status= 'Pending';doneEditing(t);update(t)"
+							autofocus />
+						<button type="button" class="btn btn-danger pull-right"
+							data-ng-click="remove(t)" title="Delete TODO">&#x2717</button>
+					</div>
+				</div>
+				<div class="panel-footer">
+					Total TODO : <span class="badge">{{todos.length}}</span> <a
+						href="#" data-ng-click="deleteAll()"> | Delete All </a> <a
+						href="#" data-ng-click="completeAll()"> | Complete ALL </a> |
+					Double click to edit todo text.
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
