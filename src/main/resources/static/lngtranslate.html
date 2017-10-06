@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html data-ng-app="trnslate">
+<head>
+<meta charset="ISO-8859-1" name="viewport"
+	content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="images/fav.png">
+<title>Translator</title>
+</head>
+<body data-ng-controller="TranslateController">
+	<div>
+		<select data-ng-model="selectedLanguage">
+			<option data-ng-repeat="language in supportedLaguages"
+				value="{{language.cd}}">{{language.desc}}</option>
+		</select>
+	</div>
+	<div>
+		<textarea rows="5" style="max-width: 300px" data-ng-model="text"
+			data-ng-keypress="alert($item)"></textarea>
+		<button data-ng-click="translateText()">Translate</button>
+	</div>
+	<div>
+		Suggested Text (Note : Click on Text to copy on clip board) :
+
+		<ul data-ng-repeat="convertedText in convertedTextList">
+			<li><a href="#" data-ng-click="copyToClipBoard(convertedText)">{{convertedText}}</a></li>
+		</ul>
+	</div>
+</body>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/lib/jquery.min.js"></script>
+<script src="js/lib/bootstrap.min.js"></script>
+<script src="js/lib/angular.min.js"></script>
+<script type="text/javascript">
+	let app = angular.module('trnslate', []);
+
+	let TranslateController = function($scope, $http) {
+		$scope.convertedTextList = [];
+		$scope.supportedLaguages = [ {
+			'cd' : 'hi',
+			'desc' : 'Hindi'
+		}, {
+			'cd' : 'ml',
+			'desc' : 'Malyalam'
+		}, {
+			'cd' : 'kn',
+			'desc' : 'Kannad'
+		}, {
+			'cd' : 'ta',
+			'desc' : 'Tamil'
+		}, {
+			'cd' : 'te',
+			'desc' : 'Telgu'
+		} ];
+
+		$scope.selectedLanguage = "hi";
+
+		$scope.translateText = function(text) {
+			let url = 'https://inputtools.google.com/request?text='
+					+ $scope.text + '&itc=' + $scope.selectedLanguage
+					+ '-t-i0-und&num=13&cp=0';
+			$http.get(url).then(function(data) {
+				$scope.convertedTextList = data.data[1][0][1];
+			}, function(error) {
+				alert(JSON.stringify(error));
+			});
+
+			$scope.copyToClipBoard();
+		}
+
+		$scope.copyToClipBoard = function(val) {
+			// create temp element
+			let copyElement = document.createElement("span");
+			copyElement.appendChild(document.createTextNode(val));
+			copyElement.id = 'tempCopyToClipboard';
+			angular.element(document.body.append(copyElement));
+
+			// select the text
+			let range = document.createRange();
+			range.selectNode(copyElement);
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);
+
+			// copy & cleanup
+			document.execCommand('copy');
+			window.getSelection().removeAllRanges();
+			copyElement.remove();
+		}
+	}
+
+	app.controller('TranslateController', [ '$scope', '$http',
+			TranslateController ])
+</script>
+</html>
