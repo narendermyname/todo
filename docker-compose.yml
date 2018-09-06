@@ -1,0 +1,6 @@
+version: '3'
+services:
+  todo:
+    image: narendermyname/todo
+    ports:
+     - "7001:7001"
